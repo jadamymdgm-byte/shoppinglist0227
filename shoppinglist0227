@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>保存できる買い物リスト</title>
+    <style>
+        body { font-family: sans-serif; max-width: 400px; margin: 20px auto; padding: 0 10px; }
+        .item-card { border: 1px solid #ddd; padding: 10px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        input { padding: 8px; width: 70%; }
+        button { padding: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🛒 買い物リスト</h1>
+    <input type="text" id="itemName" placeholder="品名を入力...">
+    <button onclick="addItem()">追加</button>
+    <div id="listContainer" style="margin-top: 20px;"></div>
+
+    <script>
+        // 1. ページを開いた時にLocalStorageからデータを読み込む
+        let items = JSON.parse(localStorage.getItem('myShoppingList')) || [];
+        render(); // 読み込んだデータで画面を描画
+
+        function addItem() {
+            const name = document.getElementById('itemName').value;
+            if (name) {
+                items.push({ name: name });
+                document.getElementById('itemName').value = '';
+                saveAndRender(); // 保存して描画
+            }
+        }
+
+        function removeItem(index) {
+            items.splice(index, 1);
+            saveAndRender(); // 保存して描画
+        }
+
+        // 2. データを保存して画面を更新する関数
+        function saveAndRender() {
+            // LocalStorageは文字列しか保存できないので、JSON形式に変換する
+            localStorage.setItem('myShoppingList', JSON.stringify(items));
+            render();
+        }
+
+        function render() {
+            const container = document.getElementById('listContainer');
+            container.innerHTML = '';
+            items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'item-card';
+                div.innerHTML = `
+                    <span>${item.name}</span>
+                    <button onclick="removeItem(${index})">削除</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
